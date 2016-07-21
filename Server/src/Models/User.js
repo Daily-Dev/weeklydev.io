@@ -222,4 +222,38 @@ UserSchema.methods = {
   }
 };
 
+UserSchema.options.toObject = {
+  transform: (doc, ret, opts) => {
+    let user = {
+      id: ret.userId,
+      username: ret.username,
+      team: ret.team,
+      project: ret.project
+    };
+    
+    let addProps = (...props) => {
+      for (let prop of props) {
+        user[prop] = ret[prop];
+      }
+    };
+    
+    if (opts.scope) {
+      switch (opts.scope) {
+        case 'user':
+          // user.ghostTeams = ret.ghostTeams;
+          addProps('ghostTeams');
+        case 'admin':
+          addProps('userId', 'email');
+          user.id = ret._id;
+          user.access = ret.scope;
+          break;
+        case 'users':
+          addProps('admin');
+      }
+    }
+    
+    return user;
+  }
+};
+
 export default mongoose.model('User', UserSchema, 'users');

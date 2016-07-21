@@ -12,7 +12,7 @@ import { cookie_options } from '../../config/config.js';
 
 export function login (req, res) {
   User.findById(req.Credentials.id)
-    .populate({ path: 'team', populate: { path: 'manager frontend backend' }})
+    .populate({ path: 'team', populate: { path: 'manager frontend backend owner' }})
     .populate('project')
     .populate({
       path: 'ghostTeams',
@@ -33,7 +33,8 @@ export function login (req, res) {
       return _user.save();
     }).then((user) => {
     let token = createToken(user);
-    res({ token, user: formatUser(user, 'user') })
+    // res({ token, user: formatUser(user, 'user') })
+    res({ token, user: user.toObject({ requests: true, scope: 'user', transform: true }) })
       .code(200)
       .state('weeklydevtoken', token, cookie_options);
   });

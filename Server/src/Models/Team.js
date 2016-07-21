@@ -70,4 +70,20 @@ TeamModel.statics.findByTeamId = (ID, callback) => {
   });
 };
 
+TeamModel.options.toObject = {
+  transform: (doc, ret, opts) => {
+    let team = {
+      owner: ret.owner,
+      shortId: ret.shortId,
+      manager: ret.manager,
+      backend: ret.backend,
+      frontend: ret.frontend
+    };
+    if (opts.requests) {
+      team.requests = ret.requests;
+    }
+    return team;
+  }
+};
+
 export default mongoose.model('Team', TeamModel, 'teams');
